@@ -80,6 +80,7 @@ public class Scratch extends Sprite {
 	// Display modes
 	public var hostProtocol:String = 'http';
 	public var editMode:Boolean; // true when project editor showing, false when only the player is showing
+	public var previewMode:Boolean; // If true, the stage should behave as if not in edit mode (i.e. as if in player-only mode)
 	public var isOffline:Boolean; // true when running as an offline (i.e. stand-alone) app
 	public var isSmallPlayer:Boolean; // true when displaying as a scaled-down player (e.g. in search results)
 	public var stageIsContracted:Boolean; // true when the stage is half size to give more space on small screens
@@ -211,6 +212,7 @@ public class Scratch extends Sprite {
 		stage.addEventListener(Event.RESIZE, onResize);
 
 		setEditMode(startInEditMode());
+		setPreviewMode(false);
 
 		// install project before calling fixLayout()
 		if (editMode) runtime.installNewProject();
@@ -881,6 +883,10 @@ public class Scratch extends Sprite {
 		stagePart.refresh();
 	}
 
+	public function setPreviewMode(newMode:Boolean):void {
+		previewMode = newMode;
+	}
+
 	protected function hide(obj:DisplayObject):void {
 		if (obj.parent) obj.parent.removeChild(obj)
 	}
@@ -1133,6 +1139,7 @@ public class Scratch extends Sprite {
 		m.addLine();
 		m.addItem('Small stage layout', toggleSmallStage, true, stageIsContracted);
 		m.addItem('Turbo mode', toggleTurboMode, true, interp.turboMode);
+		m.addItem('Preview mode', togglePreviewMode, true, app.previewMode);
 		addEditMenuItems(b, m);
 		var p:Point = b.localToGlobal(new Point(0, 0));
 		m.showOnStage(stage, b.x, topBarPart.bottom() - 1);
@@ -1270,6 +1277,10 @@ public class Scratch extends Sprite {
 	public function toggleTurboMode():void {
 		interp.turboMode = !interp.turboMode;
 		stagePart.refresh();
+	}
+
+	public function togglePreviewMode():void {
+		setPreviewMode(!previewMode);
 	}
 
 	public function handleTool(tool:String, evt:MouseEvent):void {
