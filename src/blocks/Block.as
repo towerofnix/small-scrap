@@ -849,7 +849,6 @@ public class Block extends Sprite {
 		// Note: Unlike most menu() methods, this method invokes
 		// the menu itself rather than returning a menu to the caller.
 		if (scriptBrowserBlock) {
-			DialogBox.notify('Wewlad', 'Huh');
 			originalBlock.menu(evt);
 			return;
 		}
