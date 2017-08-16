@@ -228,7 +228,7 @@ public class GestureHandler {
 
 	private function doClickImmediately():Boolean {
 		// Answer true when clicking on the stage or a locked sprite in play (presentation) mode.
-		if (app.editMode) return false;
+		if (app.editMode && !app.previewMode) return false;
 		if (mouseTarget is ScratchStage) return true;
 		return (mouseTarget is ScratchSprite) && !ScratchSprite(mouseTarget).isDraggable;
 	}
@@ -433,7 +433,7 @@ public class GestureHandler {
 		// Note: Called with a null event if gesture is click and hold.
 		Menu.removeMenusFrom(stage);
 		if (!('objToGrab' in mouseTarget)) return;
-		if (!app.editMode) {
+		if (!app.editMode || app.previewMode) {
 			if (app.loadInProgress) return;
 			if ((mouseTarget is ScratchSprite) && !ScratchSprite(mouseTarget).isDraggable) return; // don't drag locked sprites in presentation mode
 			if ((mouseTarget is Watcher) || (mouseTarget is ListWatcher)) return; // don't drag watchers in presentation mode
