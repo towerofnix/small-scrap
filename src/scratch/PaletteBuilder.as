@@ -225,27 +225,21 @@ public class PaletteBuilder {
     getSpec = Specs.GET_LIST;
     addItem(new Button(Translator.map('Make a List'), makeList));
 
-    var anyLists:Boolean = false;
-
     if (!(app.viewedObj().isStage)) {
       var localListNames:Array = app.viewedObj().listNames();
       if (localListNames.length > 0) {
         addBlocks(localListNames);
         addSeparator();
-        anyLists = true;
       }
     }
 
     var stageListNames:Array = app.stageObj().listNames();
     if (stageListNames.length > 0) {
       addBlocks(stageListNames);
-      nextY += 10;
-      anyLists = true;
     }
 
-    if (anyLists) {
-      addBlocksForCategory(Specs.listCategory, catColor);
-    }
+    nextY += 10;
+    addBlocksForCategory(Specs.listCategory, catColor);
 
     updateCheckboxes();
   }
