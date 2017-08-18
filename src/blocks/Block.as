@@ -848,16 +848,16 @@ package blocks {
 
     /* Menu */
 
-    public function menu(evt:MouseEvent):void {
+    public function menu(evt:MouseEvent, fromScriptBrowser:Boolean = false):void {
       // Note: Unlike most menu() methods, this method invokes
       // the menu itself rather than returning a menu to the caller.
       if (scriptBrowserBlock) {
-        originalBlock.menu(evt);
+        originalBlock.menu(evt, true);
         return;
       }
       if (MenuHandlerFunction == null) return;
-      if (isEmbeddedInProcHat()) MenuHandlerFunction(null, parent);
-      else MenuHandlerFunction(null, this);
+      if (isEmbeddedInProcHat()) MenuHandlerFunction(null, parent, null, null, fromScriptBrowser);
+      else MenuHandlerFunction(null, this, null, null, fromScriptBrowser);
     }
 
     public function handleTool(tool:String, evt:MouseEvent):void {

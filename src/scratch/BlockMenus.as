@@ -46,6 +46,7 @@ package scratch {
     private var startY:Number;
     private var block:Block;
     private var blockArg:BlockArg; // null if menu is invoked on a block
+    private var fromScriptBrowser:Boolean; // true if menu is invoked on a script browser block
 
     private static const basicMathOps:Array = ['+', '-', '*', '/'];
     private static const comparisonOps:Array = ['<', '=', '>'];
@@ -53,8 +54,8 @@ package scratch {
     private static const spriteAttributes:Array = ['x position', 'y position', 'direction', 'costume #', 'costume name', 'size', 'volume'];
     private static const stageAttributes:Array = ['backdrop #', 'backdrop name', 'volume'];
 
-    public static function BlockMenuHandler(evt:MouseEvent, block:Block, blockArg:BlockArg = null, menuName:String = null):void {
-      var menuHandler:BlockMenus = new BlockMenus(block, blockArg);
+    public static function BlockMenuHandler(evt:MouseEvent, block:Block, blockArg:BlockArg = null, menuName:String = null, fromScriptBrowser:Boolean = false):void {
+      var menuHandler:BlockMenus = new BlockMenus(block, blockArg, fromScriptBrowser);
       var op:String = block.op;
       if (menuName == null) { // menu gesture on a block (vs. an arg)
         if (op == Specs.GET_LIST) menuName = 'list';
@@ -156,12 +157,13 @@ package scratch {
       ];
     }
 
-    public function BlockMenus(block:Block, blockArg:BlockArg) {
+    public function BlockMenus(block:Block, blockArg:BlockArg, fromScriptBrowser:Boolean = false) {
       app = Scratch.app;
       this.startX = app.mouseX;
       this.startY = app.mouseY;
       this.blockArg = blockArg;
       this.block = block;
+      this.fromScriptBrowser = fromScriptBrowser;
     }
 
     public static function shouldTranslateItemForMenu(item:String, menuName:String):Boolean {
@@ -525,14 +527,12 @@ package scratch {
       if (!block) return;
       m.addLine();
       if (!isInPalette(block)) {
-        if (!block.isProcDef()) {
+        if (!block.isProcDef() && !fromScriptBrowser) {
           m.addItem('duplicate', duplicateStack);
         }
         m.addItem('delete', block.deleteStack);
         m.addLine();
-        m.addItem('add comment', block.addComment);
       }
-      //m.addItem('help', block.showHelp);
       m.addItem('show spec', block.showSpec);
       m.addLine();
     }
