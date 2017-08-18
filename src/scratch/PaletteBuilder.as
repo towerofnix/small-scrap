@@ -44,6 +44,8 @@ import ui.parts.UIPart;
 
 import uiwidgets.*;
 
+import util.JSON;
+
 public class PaletteBuilder {
 
   protected var app:Scratch;
@@ -141,12 +143,12 @@ public class PaletteBuilder {
       nextY += 5;
     }
 
-    addAddLibraryButton();
-    var magicDefinitions:Array = app.viewedObj().magicProcedureDefinitions();
-    if (magicDefinitions.length > 0) {
+    addLibraryButtons();
+    var libraryDefinitions:Array = app.viewedObj().libraryProcedureDefinitions();
+    if (libraryDefinitions.length > 0) {
       nextY += 5;
-      for each (var proc:Block in magicDefinitions) {
-        b = new Block(proc.spec, ' ', Specs.extensionsColor, Specs.CALL, proc.defaultArgValues);
+      for each (var proc:Block in libraryDefinitions) {
+        b = new Block(proc.spec, ' ', Specs.procedureColor, Specs.CALL, proc.defaultArgValues);
         addItem(b);
       }
       nextY += 5;
@@ -170,8 +172,9 @@ public class PaletteBuilder {
     }
   }
 
-  protected function addAddLibraryButton():void {
+  protected function addLibraryButtons():void {
     addItem(new Button('Add Scrap Library', addScrapLibrary, false));
+    addItem(new Button('Import a Library', importLibraryFromDisk, false));
   }
 
   private function showDataCategory():void {
@@ -341,33 +344,50 @@ public class PaletteBuilder {
   private function addScrapLibrary():void {
     var targetObj:ScratchObj = app.viewedObj();
 
-    // Remove Scrap library, first.
-    var newScripts:Array = [];
-    for each (var script in targetObj.scripts) {
-      if (script.op === Specs.PROCEDURE_DEF && script.spec.indexOf(Specs.MAGIC_PROC_PREFIX) === 0) {
-        continue;
+    app.importLibraryTo(targetObj, {
+      id: "scrap",
+      displayName: "Scrap",
+      scripts: [
+        [
+          ["procDef", "set broadcast %m.broadcast 's var %m.broadcastVar to %s", ["bc", "var", "value"], ["", "", ""], false],
+          ["setVar:to:",
+            ["concatenate:with:",
+              Specs.BROADCAST_VAR_PREFIX,
+              ["concatenate:with:",
+                ["getParam", "bc", "r"],
+                ["concatenate:with:",
+                  ">", ["getParam", "var", "r"]]]]]
+        ]
+      ]
+    });
+  }
+
+  private function importLibraryFromDisk():void {
+    function fileSelected(e:Event):void {
+      for each (var item in files.fileList) {
+        var file:FileReference = FileReference(item);
+        file.addEventListener(Event.COMPLETE, fileLoaded);
+        file.load();
       }
-      newScripts.push(script);
     }
-    targetObj.scripts = newScripts;
 
-    targetObj.addJSONScripts([
-      [10, 10, [
-        ["procDef",
-         Specs.MAGIC_PROC_PREFIX + "set broadcast %m.broadcast 's var %m.broadcastVar to %s",
-         ["bc", "var", "value"], ["", "", ""], false],
-        ["setVar:to:",
-         ["concatenate:with:",
-          Specs.BROADCAST_VAR_PREFIX,
-          ["concatenate:with:",
-           ["getParam", "bc", "r"],
-           ["concatenate:with:",
-            ">", ["getParam", "var", "r"]]]],
-         ["getParam", "value", "r"]]
-      ]]
-    ]);
+    function fileLoaded(e:Event):void {
+      var file:FileReference = FileReference(e.target);
+      var libraryJSON:String = file.data.readUTFBytes(file.data.length);
+      var library:Object = util.JSON.parse(libraryJSON);
+      app.importLibraryTo(targetObj, library);
+    }
 
-    app.updatePalette()
+    var targetObj:ScratchObj = app.viewedObj();
+
+    var files:FileReferenceList = new FileReferenceList();
+    files.addEventListener(Event.SELECT, fileSelected);
+
+    var filter:FileFilter = new FileFilter("Custom Block Libraries", "*.json");
+
+    try {
+      files.browse([filter]);
+    } catch (e:*) {}
   }
 
   protected function addReporterCheckbox(block:Block):void {
