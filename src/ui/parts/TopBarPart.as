@@ -187,9 +187,7 @@ public class TopBarPart extends UIPart {
 	}
 
 	public function refresh():void {
-		if (app.isOffline) {
-			helpTool.visible = app.isOffline;
-		}
+		helpTool.visible = app.isOffline;
 
 		if (Scratch.app.isExtensionDevMode) {
 			var hasExperimental:Boolean = app.extensionManager.hasExperimentalExtensions();
