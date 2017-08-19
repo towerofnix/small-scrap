@@ -1664,13 +1664,8 @@ package {
         return;
       }
 
-      if (!('id' in library)) {
-        DialogBox.notify("Cannot Import", "No 'id' property in library object.");
-        return;
-      }
-
-      if (!('displayName' in library)) {
-        DialogBox.notify("Cannot Import", "No 'displayName' property in library object.");
+      if (!('name' in library)) {
+        DialogBox.notify("Cannot Import", "No 'name' property in library object.");
         return;
       }
 
@@ -1701,8 +1696,8 @@ package {
     public function removeLibraryByPrefixString(targetObj:ScratchObj, prefix:String):void {
       // Removes a block library.
       // That just means we need to remove all custom blocks whose specs begin
-      // with the "magic prefix" (which is determined by the library's "id" and
-      // "displayName" properties).
+      // with the "magic prefix" (which is determined by the library's "name"
+      // property).
       var newScripts:Array = [];
       for each (var script:Block in targetObj.scripts) {
         if (script.op === Specs.PROCEDURE_DEF && script.spec.indexOf(prefix) === 0) {
@@ -1712,7 +1707,6 @@ package {
       }
       targetObj.scripts = newScripts;
     }
-
 
     public function exportLibraryOfBlock(block:Block):void {
       // This only knows to assume that the targetObj is the editor-selected
@@ -1730,17 +1724,14 @@ package {
         return;
       }
 
-      var library:Object = {
-        id: match.libraryID,
-        displayName: match.displayName
-      };
+      var library:Object = {name: match.name};
 
       var targetObj:ScratchObj = viewedObj();
 
       exportLibraryScriptsOf(targetObj, library);
 
       var jsonData = util.JSON.stringify(library);
-      var defaultName:String = library.id + ".json";
+      var defaultName:String = library.name + ".json";
       var file:FileReference = new FileReference();
       file.addEventListener(Event.COMPLETE, success);
       file.save(jsonData, defaultName);
@@ -1778,16 +1769,16 @@ package {
     }
 
     public function getLibraryPrefixString(library:Object):String {
-      return "$$" + library.id + "$" + library.displayName + ":";
+      return "$$" + library.name + ":";
     }
 
     public function parseLibraryPrefixString(str:String):Object {
       // Reads a library-prefix string. Note that the given string can also
-      // include text past the prefix (so "$$foo$Foo Library:baaaz)" works just
-      // as well as "$$foo$Foo Library:" alone).
+      // include text past the prefix (so "$$Foo Library:baaaz)" works just
+      // as well as "$$Foo Library:" alone).
 
-      // In human terms: "$$" <library id> "$" <display name> ":"
-      var re:RegExp = /^\$\$([^$]+)\$([^:]+):/;
+      // In human terms: "$$" <library name> ":"
+      var re:RegExp = /^\$\$([^$]+):/;
       var match = re.exec(str);
 
       if (match == null) {
@@ -1798,11 +1789,10 @@ package {
       var rest:String = str.slice(prefix.length);
 
       return {
-        libraryID: match[1],
-        displayName: match[2],
+        name: match[1],
         prefix: prefix,
         rest: rest,
-        displayText: "(" + match[2] + ") " + rest
+        displayText: "(" + match[1] + ") " + rest
       };
     }
 

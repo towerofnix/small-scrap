@@ -345,8 +345,7 @@ public class PaletteBuilder {
     var targetObj:ScratchObj = app.viewedObj();
 
     app.importLibraryTo(targetObj, {
-      id: "scrap",
-      displayName: "Scrap",
+      name: "Scrap",
       scripts: [
         [
           ["procDef", "set broadcast %m.broadcast 's var %m.broadcastVar to %s", ["bc", "var", "value"], ["", "", ""], false],

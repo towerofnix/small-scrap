@@ -568,8 +568,8 @@ package scratch {
 
       var match:Object = app.parseLibraryPrefixString(block.spec);
       if (match !== null) {
-        m.addItem("export library " + match.displayName, exportLibrary);
-        m.addItem("remove library " + match.displayName, removeLibrary);
+        m.addItem("export library " + match.name, exportLibrary);
+        m.addItem("remove library " + match.name, removeLibrary);
       }
 
       showMenu(m);
