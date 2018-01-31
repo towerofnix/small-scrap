@@ -1622,15 +1622,6 @@ package {
     }
 
     // -----------------------------
-    // Browse Scripts
-    //------------------------------
-
-    public function selectScript(script:Block):void {
-      scriptsPane.viewOneScript(script);
-      updatePalette();
-    }
-
-    // -----------------------------
     // Custom Block Libraries
     //------------------------------
 

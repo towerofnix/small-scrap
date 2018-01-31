@@ -116,7 +116,7 @@ public class ScriptsPane extends ScrollFrameContents {
 		(parent as ScrollFrame).updateScrollbars();
 	}
 
-	public function viewOneScript(block:Block):void {
+	public function jumpToScript(block:Block):void {
 		var pane:ScriptsPane = block.parent as ScriptsPane;
 		if (!pane) return;
 		if (pane.parent is ScrollFrame) {

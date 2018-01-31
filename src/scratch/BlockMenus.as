@@ -579,9 +579,7 @@ package scratch {
       if(!app.editMode) return;
       if (block.op != Specs.CALL) return;
       var def:Block = app.viewedObj().lookupProcedure(block.spec);
-      if (!def) return;
-
-      app.selectScript(def);
+      app.scriptsPane.jumpToScript(def);
     }
 
     private function editProcSpec():void {
@@ -590,7 +588,7 @@ package scratch {
         if (!def) return;
         block = def;
       }
-      app.selectScript(block);
+      app.scriptsPane.jumpToScript(def);
       var d:DialogBox = new DialogBox(editSpec2);
       d.addTitle('Edit Block');
       d.addWidget(new ProcedureSpecEditor(block.spec, block.parameterNames, block.warpProcFlag));
