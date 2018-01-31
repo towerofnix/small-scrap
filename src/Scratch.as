@@ -130,7 +130,6 @@ package {
     protected var stagePart:StagePart;
     private var tabsPart:TabsPart;
     protected var scriptsPart:ScriptsPart;
-    protected var scriptBrowserPart:ScriptBrowserPart;
     public var imagesPart:ImagesPart;
     public var soundsPart:SoundsPart;
     public const tipsBarClosedWidth:int = 17;
@@ -353,10 +352,6 @@ package {
 
     protected function initImagesPart():void {
       imagesPart = new ImagesPart(this);
-    }
-
-    protected function initScriptBrowserPart():void {
-      scriptBrowserPart = new ScriptBrowserPart(this);
     }
 
     protected function initInterpreter():void {
@@ -624,7 +619,6 @@ package {
       // Note: updatePalette() is called after changing variable, list, or procedure
       // definitions, so this is a convenient place to clear the interpreter's caches.
       if (isShowing(scriptsPart)) scriptsPart.updatePalette();
-      if (isShowing(scriptBrowserPart)) scriptBrowserPart.updateContents();
       if (clearCaches) runtime.clearAllCaches();
     }
 
@@ -781,9 +775,6 @@ package {
         scriptsPart.updatePalette();
         scriptsPart.updateSpriteWatermark();
       }
-      if (isShowing(scriptBrowserPart)) {
-        scriptBrowserPart.selectedSpriteUpdated();
-      }
     }
 
     public function setTab(tabName:String):void {
@@ -833,14 +824,12 @@ package {
       libraryPart = getLibraryPart();
       tabsPart = new TabsPart(this);
       initScriptsPart();
-      initScriptBrowserPart();
       initImagesPart();
       soundsPart = new SoundsPart(this);
       addChild(topBarPart);
       addChild(stagePart);
       addChild(libraryPart);
       addChild(tabsPart);
-      addChild(scriptBrowserPart);
     }
 
     protected function getStagePart():StagePart {
@@ -865,7 +854,6 @@ package {
       if (editMode) {
         interp.showAllRunFeedback();
         hide(playerBG);
-        show(scriptBrowserPart);
         show(topBarPart);
         show(libraryPart);
         show(tabsPart);
@@ -875,7 +863,6 @@ package {
       } else {
         addChildAt(playerBG, 0); // behind everything
         playerBG.visible = false;
-        hide(scriptBrowserPart);
         hide(topBarPart);
         hide(libraryPart);
         hide(tabsPart);
@@ -983,22 +970,11 @@ package {
     }
 
     protected function updateContentArea(contentX:int, contentY:int, contentW:int, contentH:int, fullH:int):void {
-      var scriptBrowserH = contentH / 4;
-      if (scriptBrowserH > 200) {
-        scriptBrowserH = 200;
-      } else if (scriptBrowserH < 100) {
-        scriptBrowserH = 100;
-      }
-      scriptBrowserH -= 10;
-
       imagesPart.x = soundsPart.x = scriptsPart.x = contentX;
       imagesPart.y = soundsPart.y = scriptsPart.y = contentY;
       imagesPart.setWidthHeight(contentW, contentH);
       soundsPart.setWidthHeight(contentW, contentH);
-      scriptsPart.setWidthHeight(contentW, contentH - (scriptBrowserH + 5));
-      scriptBrowserPart.x = contentX;
-      scriptBrowserPart.y = scriptsPart.bottom() + 5;
-      scriptBrowserPart.setWidthHeight(contentW, scriptBrowserH);
+      scriptsPart.setWidthHeight(contentW, contentH - 5);
 
       if (mediaLibrary) mediaLibrary.setWidthHeight(topBarPart.w, fullH);
       if (frameRateGraph) {

@@ -75,7 +75,6 @@ package blocks {
     public var parameterNames:Array;	// used by procedure definition hats; null for other blocks
     public var warpProcFlag:Boolean;	// used by procedure definition hats to indicate warp speed
     public var rightToLeft:Boolean;
-    public var scriptBrowserBlock:Boolean;
     public var originalBlock:Block; // for script browser blocks
 
     public var isHat:Boolean = false;
@@ -181,7 +180,6 @@ package blocks {
       }
       addChildAt(base, 0);
       setSpec(this.spec, defaultArgs);
-      scriptBrowserBlock = false;
 
       addEventListener(FocusEvent.KEY_FOCUS_CHANGE, focusChange);
     }
@@ -848,16 +846,12 @@ package blocks {
 
     /* Menu */
 
-    public function menu(evt:MouseEvent, fromScriptBrowser:Boolean = false):void {
+    public function menu(evt:MouseEvent):void {
       // Note: Unlike most menu() methods, this method invokes
       // the menu itself rather than returning a menu to the caller.
-      if (scriptBrowserBlock) {
-        originalBlock.menu(evt, true);
-        return;
-      }
       if (MenuHandlerFunction == null) return;
-      if (isEmbeddedInProcHat()) MenuHandlerFunction(null, parent, null, null, fromScriptBrowser);
-      else MenuHandlerFunction(null, this, null, null, fromScriptBrowser);
+      if (isEmbeddedInProcHat()) MenuHandlerFunction(null, parent, null, null);
+      else MenuHandlerFunction(null, this, null, null);
     }
 
     public function handleTool(tool:String, evt:MouseEvent):void {
@@ -966,7 +960,6 @@ package blocks {
     /* Dragging */
 
     public function objToGrab(evt:MouseEvent):Block {
-      if (scriptBrowserBlock) return makeSenderBlock();
       if (isEmbeddedParameter() || isInPalette()) return duplicate(false, Scratch.app.viewedObj() is ScratchStage);
       return this;
     }
@@ -974,39 +967,6 @@ package blocks {
     private static const eventsColor:int = Specs.blockColor(Specs.eventsCategory);
     private static const controlColor:int = Specs.blockColor(Specs.controlCategory);
     private static const looksColor:int = Specs.blockColor(Specs.looksCategory);
-
-    public function makeSenderBlock():Block {
-      // Make a new block that would call this (hat) block, if such a block
-      // exists. Otherwise just return a duplicate of this block. Used when
-      // dragging a script browser block.
-
-      var b:Block;
-
-      if (op === Specs.PROCEDURE_DEF) {
-        b = new Block(spec, ' ', Specs.procedureColor, Specs.CALL, defaultArgValues);
-        return b;
-      }
-
-      if (op === 'whenIReceive') {
-        b = new Block('broadcast %m.broadcast', ' ', eventsColor, 'broadcast:');
-        b.setArg(0, getNormalizedArg(0).argValue);
-        return b;
-      }
-
-      if (op === 'whenCloned') {
-        b = new Block('create clone of %m.spriteOnly', ' ', controlColor, 'createCloneOf');
-        b.setArg(0, 'myself');
-        return b;
-      }
-
-      if (op === 'whenSceneStarts') {
-        b = new Block('switch backdrop to %m.backdrop', ' ', looksColor, 'startScene');
-        b.setArg(0, getNormalizedArg(0).argValue);
-        return b;
-      }
-
-      return this.duplicate(false, Scratch.app.viewedObj() is ScratchStage);
-    }
 
     /* Events */
 

@@ -117,33 +117,14 @@ public class ScriptsPane extends ScrollFrameContents {
 	}
 
 	public function viewOneScript(block:Block):void {
-		restoreScriptPosition();
-
-		saveScripts(false);
-		while (numChildren > 0) {
-			var child:DisplayObject = removeChildAt(0);
-			child.cacheAsBitmap = false;
+		var pane:ScriptsPane = block.parent as ScriptsPane;
+		if (!pane) return;
+		if (pane.parent is ScrollFrame) {
+			pane.x = 5 - block.x*pane.scaleX;
+			pane.y = 5 - block.y*pane.scaleX;
+			(pane.parent as ScrollFrame).constrainScroll();
+			(pane.parent as ScrollFrame).updateScrollbars();
 		}
-
-		viewedScript = block;
-		viewedScriptX = block.x;
-		viewedScriptY = block.y;
-
-		// No comments for now
-
-		// Viewed script not saved for now
-
-		// Script should be positioned at whatever the padding value that's used
-		// in clean-up is
-		block.x = block.y = padding;
-
-		block.cacheAsBitmap = true;
-		addChild(block);
-
-		// Reset scroll offset
-		updateSize();
-		x = y = 0;
-		(parent as ScrollFrame).updateScrollbars();
 	}
 
 	public function saveScripts(saveNeeded:Boolean = true):void {
